@@ -107,7 +107,7 @@ export default function ModelsPage() {
   };
 
   const handleUpload = () => {
-    if (!selectedFile || !modelName) {
+    if (!selectedFile || !modelName.trim()) {
       toast({
         title: "Missing information",
         description: "Please select a file and enter a model name.",
@@ -116,16 +116,28 @@ export default function ModelsPage() {
       return;
     }
 
-    // Simulate upload
+    // Validate file type
+    const validExtensions = ['.pt', '.pth'];
+    const fileExtension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
+    if (!validExtensions.includes(fileExtension)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a .pt or .pth file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Simulate upload with progress
     const newModel: ModelVersion = {
       id: `${modelType}-${Date.now()}`,
-      name: modelName,
+      name: modelName.trim(),
       version: "1.0",
       type: modelType,
       status: "inactive",
       size: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date().toISOString(),
-      sha256: "uploading..."
+      sha256: `${Date.now().toString(36)}...`
     };
 
     setModels([newModel, ...models]);
@@ -135,7 +147,7 @@ export default function ModelsPage() {
 
     toast({
       title: "Model uploaded",
-      description: `${modelName} has been uploaded successfully.`,
+      description: `${modelName.trim()} has been uploaded successfully.`,
     });
   };
 
@@ -233,7 +245,7 @@ export default function ModelsPage() {
                     id="model-type"
                     value={modelType}
                     onChange={(e) => setModelType(e.target.value as "autoencoder" | "classifier")}
-                    className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     <option value="autoencoder">Autoencoder</option>
                     <option value="classifier">Classifier</option>
@@ -301,7 +313,23 @@ export default function ModelsPage() {
                           Activate
                         </Button>
                       )}
-                      <Button size="sm" variant="ghost">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => {
+                          // Simulate download
+                          const link = document.createElement('a');
+                          link.href = '#';
+                          link.download = `${model.name.replace(/\s+/g, '_')}_v${model.version}.pt`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          toast({
+                            title: "Download started",
+                            description: `${model.name} download initiated.`,
+                          });
+                        }}
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
                       {model.status !== "active" && (
@@ -363,7 +391,23 @@ export default function ModelsPage() {
                           Activate
                         </Button>
                       )}
-                      <Button size="sm" variant="ghost">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => {
+                          // Simulate download
+                          const link = document.createElement('a');
+                          link.href = '#';
+                          link.download = `${model.name.replace(/\s+/g, '_')}_v${model.version}.pt`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          toast({
+                            title: "Download started",
+                            description: `${model.name} download initiated.`,
+                          });
+                        }}
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
                       {model.status !== "active" && (
